@@ -1,15 +1,15 @@
 import path from 'path';
 
 import {
-  AssetServerPlugin,
   DefaultJobQueuePlugin,
   DefaultSearchPlugin,
   dummyPaymentHandler,
   VendureConfig,
 } from '@vendure/core';
 import { DefaultLogger, LogLevel } from '@vendure/core';
-import { GraphiQLPlugin } from '@vendure/graphiql-plugin';
-import { DashboardPlugin } from '@vendure/dashboard';
+import { AssetServerPlugin } from '@vendure/asset-server-plugin';
+import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
+import { DashboardPlugin } from '@vendure/dashboard/plugin';
 
 // Load env from .env (dotenv is installed)
 require('dotenv').config();
@@ -52,13 +52,12 @@ export const config: VendureConfig = {
       assetUploadDir: path.join(__dirname, '../static/assets'),
     }),
     DefaultJobQueuePlugin,
-    GraphiQLPlugin.init({
+    GraphiqlPlugin.init({
       route: 'graphiql',
-      playground: true,
     }),
     DashboardPlugin.init({
       route: 'dashboard',
-      port,
+      appDir: path.join(__dirname, '../dist/dashboard'),
     }),
   ],
 };
