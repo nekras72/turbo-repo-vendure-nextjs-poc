@@ -1,10 +1,9 @@
-import path from 'path';
-import { fileURLToPath } from 'node:url';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
 import { defineConfig } from 'vite';
 import { vendureDashboardPlugin } from '@vendure/dashboard/vite';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   base: '/dashboard/',
@@ -14,7 +13,7 @@ export default defineConfig({
   },
   plugins: [
     vendureDashboardPlugin({
-      vendureConfigPath: pathToFileURL(path.join(__dirname, 'src/vendure-config.ts')).href,
+      vendureConfigPath: pathToFileURL(join(__dirname, 'src/vendure-config.ts')).href,
       api: { host: 'http://localhost', port: 3000 },
       gqlOutputPath: './src/gql',
     }),
