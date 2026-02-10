@@ -1,18 +1,18 @@
-# Turbo Repo + Vendure + Next.js POC
+# Turborepo + Next.js + NestJS (Vercel Free POC)
 
-Monorepo with a **Vendure** backend (shop API) and a **Next.js** storefront, managed with Turborepo.
+Monorepo with a **Next.js** frontend and a **NestJS** backend, both deployable on **Vercel** (Free tier) as two separate projects.
 
 ## Structure
 
-| App           | Path               | Description                    |
-|---------------|--------------------|--------------------------------|
-| **Vendure**   | `apps/shop-api`    | GraphQL Shop API & Admin API   |
-| **Storefront**| `apps/storefront`  | Next.js storefront             |
-| **Shared**    | `packages/*`       | TypeScript config, etc.       |
+| App    | Path         | Description                          |
+|--------|--------------|--------------------------------------|
+| **web**| `apps/web`   | Next.js frontend (Vercel)            |
+| **api**| `apps/api`   | NestJS backend, serverless (Vercel)  |
+| Shared | `packages/*` | TypeScript config, etc.              |
 
 ## Requirements
 
-- **Node.js** ≥ 18 (Vendure recommends 20+)
+- **Node.js** ≥ 18
 - **pnpm** (see `packageManager` in root `package.json`)
 
 ## Setup
@@ -25,48 +25,67 @@ pnpm install
 
 ### Run everything
 
-- **`pnpm dev`** – Vendure (server + worker + dashboard) + Next.js storefront
+- **`pnpm dev`** – web + api (in parallel)
 
 ### Run apps separately
 
-- **`pnpm dev:vendure`** – Vendure only (port 3000)
-- **`pnpm dev:storefront`** – Next.js storefront only (port 3001)
+- **`pnpm dev:web`** – Next.js only (port 3000)
+- **`pnpm dev:api`** – NestJS only (port 3001)
 
 ### Build
 
 - **`pnpm build`** – Build all apps
-- **`pnpm build:vendure`** – Build Vendure (server + dashboard)
-- **`pnpm build:storefront`** – Build storefront
+- **`pnpm build:web`** – Build frontend
+- **`pnpm build:api`** – Build API
 
 ### Start (production-style, after build)
 
 - **`pnpm start`** – Start all apps
-- **`pnpm start:vendure`** – Start Vendure
-- **`pnpm start:storefront`** – Start storefront
+- **`pnpm start:web`** – Start Next.js
+- **`pnpm start:api`** – Start NestJS (local server; not used on Vercel)
 
 ### Lint
 
 - **`pnpm lint`** – Lint all apps
 
-## Ports
+## Ports (local)
 
-| Port  | App        | URLs |
-|-------|------------|------|
-| **3000** | Vendure   | Shop API: `/shop-api`, Admin API: `/admin-api`, GraphiQL: `/graphiql`, Dashboard: `/dashboard` |
-| **3001** | Storefront | Next.js app |
+| Port  | App  | URLs                    |
+|-------|------|-------------------------|
+| **3000** | web | Next.js app             |
+| **3001** | api | NestJS (e.g. `/`, `/health`) |
 
-## Vendure
+## API (NestJS serverless)
 
-- **Superadmin**: `superadmin` / `superadmin` (override in `apps/shop-api/.env`)
-- **Database**: SQLite (`apps/shop-api/vendure.sqlite`) for POC
-- See `apps/shop-api/README.md` for shop-api details.
+- **No `app.listen()`** — serverless handler in `apps/api/api/index.ts` only.
+- **Express adapter** — Nest uses `@nestjs/platform-express`.
+- **Cached handler** — Nest app is created once per function instance, then requests are forwarded to it.
+- **Local dev** — `pnpm dev:api` runs `src/server.ts`, which does call `listen()` for local testing only.
 
-## Storefront
+Set **`CORS_ORIGIN`** (optional) to your web app URL in production (e.g. `https://your-web.vercel.app`).
 
-- Set **`NEXT_PUBLIC_SHOP_API_URL`** to your Vendure Shop API (e.g. `http://localhost:3000/shop-api`) when connecting the frontend to the API.
-- See `apps/storefront/` for the Next.js app.
+## Web (Next.js)
 
-## Deployment
+Set **`NEXT_PUBLIC_API_URL`** to your API base URL (e.g. `https://your-api.vercel.app` or `http://localhost:3001` for local).
 
-- **Storefront** → e.g. **Vercel** (set root to `apps/storefront`, add `NEXT_PUBLIC_SHOP_API_URL`).
-- **Vendure** → **Railway**, **Render**, **Fly.io**, or Docker (long-running Node server; not suitable for Vercel serverless).
+## Deployment (two Vercel projects)
+
+Create **two** Vercel projects from the same repository.
+
+### 1. Web project (Next.js)
+
+- **Root Directory:** `apps/web`
+- **Framework Preset:** Next.js
+- **Build Command:** `cd ../.. && pnpm install && turbo run build --filter=web`
+- **Install Command:** `cd ../.. && pnpm install`
+- **Environment variables:** `NEXT_PUBLIC_API_URL` = your API project URL (e.g. `https://your-api.vercel.app`)
+
+### 2. API project (NestJS serverless)
+
+- **Root Directory:** `apps/api`
+- **Build Command:** `cd ../.. && pnpm install && turbo run build --filter=api`
+- **Install Command:** `cd ../.. && pnpm install`
+- **Environment variables (optional):** `CORS_ORIGIN` = your web project URL
+- **`vercel.json`** in `apps/api` routes all requests to the serverless handler (`/api`).
+
+Vercel Free plan: short-lived functions, no WebSockets, no long-running background jobs. For persistence use a serverless-friendly DB (e.g. **Neon**, **Supabase**) and add the connection URL in the API project env vars when you need it.

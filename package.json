@@ -3,14 +3,14 @@
   "private": true,
   "scripts": {
     "dev": "turbo run dev",
-    "dev:vendure": "turbo run dev --filter=@repo/shop-api",
-    "dev:storefront": "turbo run dev --filter=storefront",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:api": "turbo run dev --filter=api",
     "build": "turbo run build",
-    "build:vendure": "turbo run build --filter=@repo/shop-api",
-    "build:storefront": "turbo run build --filter=storefront",
+    "build:web": "turbo run build --filter=web",
+    "build:api": "turbo run build --filter=api",
     "start": "turbo run start",
-    "start:vendure": "turbo run start --filter=@repo/shop-api",
-    "start:storefront": "turbo run start --filter=storefront",
+    "start:web": "turbo run start --filter=web",
+    "start:api": "turbo run start --filter=api",
     "lint": "turbo run lint"
   },
   "devDependencies": {
