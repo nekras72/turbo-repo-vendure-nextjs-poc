@@ -1,0 +1,24 @@
+{
+  "name": "turbo-vendure-nextjs-poc",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:vendure": "turbo run dev --filter=@repo/shop-api",
+    "dev:storefront": "turbo run dev --filter=storefront",
+    "build": "turbo run build",
+    "build:vendure": "turbo run build --filter=@repo/shop-api",
+    "build:storefront": "turbo run build --filter=storefront",
+    "start": "turbo run start",
+    "start:vendure": "turbo run start --filter=@repo/shop-api",
+    "start:storefront": "turbo run start --filter=storefront",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
